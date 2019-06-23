@@ -2,6 +2,7 @@
 # 数据导出到数据库
 import requests
 import csv
+import os
 from requests import RequestException
 from pyquery import PyQuery as pq
 
@@ -44,14 +45,18 @@ def parse_html(html):
 
 def ini_csv():
     file_header = ['city_name', 'city_code']
-    csv_file = open("city_list.csv", "w", newline='')
+    module_path = os.path.dirname(os.path.dirname(__file__))
+    csv_file_name = module_path + '/data/city_list.csv'
+    csv_file = open(csv_file_name, "w", newline='')
     writer = csv.writer(csv_file)
     writer.writerow(file_header)
     csv_file.close()
 
 
 def write_csv(city_name, city_code):
-    csv_file = open("city_list.csv", "a", newline='')
+    module_path = os.path.dirname(os.path.dirname(__file__))
+    csv_file_name = module_path + '/data/city_list.csv'
+    csv_file = open(csv_file_name, "a", newline='')
     writer = csv.writer(csv_file)
     writer.writerow([city_name, city_code])
     csv_file.close()

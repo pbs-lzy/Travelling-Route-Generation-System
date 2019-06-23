@@ -21,13 +21,13 @@ from Map.TwoPlacesRoute import transit
 min_total_playtime = 11
 max_total_playtime = 13
 
-
+#   return travel spots of a city and corresponding addresses and play time
 def load_data():
     all_titles, all_addresses = get_city_places()
     play_time = get_places_playtime(all_titles)
     return all_titles, all_addresses, play_time
 
-
+#   
 def choose_place(play_time, num_days):
     num_place = 0
     total_time = 0
@@ -81,7 +81,7 @@ def get_next_place(place_flag, address, curr_place_address):
             next_place = i
     return next_place, min_time
 
-
+#   
 def main():
     title, address, play_time = load_data()
     num_days = 4

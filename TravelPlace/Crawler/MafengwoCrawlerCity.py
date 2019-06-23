@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 数据导出到数据库
 import re
-
+import os
 import requests
 import csv
 from requests import RequestException
@@ -12,7 +12,8 @@ from pyquery import PyQuery as pq
 # 3.得到用时参考
 # 4.如果没有结果 则返回2小时
 
-csv_file_name = "D:/DevelopTest/ProjectTest/TravelPlace/data/city_list.csv"
+module_path = os.path.dirname(os.path.dirname(__file__))
+csv_file_name = module_path + '/data/city_list.csv'
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0) Gecko/20100101 Firefox/67.0'}

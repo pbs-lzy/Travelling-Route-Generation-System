@@ -2,7 +2,18 @@ import urllib.parse
 import urllib.request
 import json
 
-from Crawler.CrawlerPlace import get_lng_lat
+
+#from Crawler.CrawlerPlace import get_lng_lat
+def get_lng_lat(address):
+    url = 'http://api.map.baidu.com/geocoder/v2/?address='
+    output = 'json'
+    ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+    add = urllib.parse.quote(address)  # 本文城市变量为中文，为防止乱码，先用quote进行编码
+    url2 = url + add + '&output=' + output + "&ak=" + ak
+    req = urllib.request.urlopen(url2)
+    res = req.read().decode()
+    temp = json.loads(res)
+    return temp
 
 key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
 
