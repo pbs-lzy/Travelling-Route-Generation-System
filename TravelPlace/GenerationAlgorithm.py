@@ -10,83 +10,109 @@
             2.遍历所有点，储存用时，比较出最短用时的下一地点
             3.进入下一地点，到达过的地点不再遍历
 
+从当前景点A决定去不去下一个景点B的话 应该是判断
+（去B的时间+B的建议游玩时间+B到酒店的时间）<剩下可以玩的时间 否则的话找下一个可能的B'再判断
+
 加上如果公交时间>3小时或没有公交线路时，打车
 """
+import copy
 import sys
 
-from Crawler.CrawlerPlace import get_lng_lat, get_city_places
-from Crawler.CrawlerPlayTime import get_places_playtime
-from Map.TwoPlacesRoute import transit
+from TravelPlace.Crawler.CrawlerCityDays import get_cities_play_days
+from TravelPlace.Crawler.CrawlerPlace import get_city_places
+from TravelPlace.Crawler.CrawlerPlayTime import get_places_playtime
+from TravelPlace.Map.InterCityRoute import generate_inter_city_route
+from TravelPlace.Map.TwoPlacesRoute import transit
 
 min_total_playtime = 11
 max_total_playtime = 13
 
-#   return travel spots of a city and corresponding addresses and play time
-def load_data():
-    all_titles, all_addresses = get_city_places()
-    play_time = get_places_playtime(all_titles)
-    return all_titles, all_addresses, play_time
 
-#   
+def load_data(city_name):
+    all_titles, all_location, all_addresses = get_city_places(city_name)
+    play_time = get_places_playtime(all_titles)
+    return all_titles, all_location, all_addresses, play_time
+
+
 def choose_place(play_time, num_days):
     num_place = 0
     total_time = 0
-    while total_time <= (min_total_playtime * num_days):
+    while total_time <= (max_total_playtime * num_days):
+        # print(total_time)
         total_time = total_time + play_time[num_place]
         num_place = num_place + 1
     return num_place
 
 
-def multi_day_route(title, address, play_time, num_days):
-    place_flag = [0] * len(address)
+def multi_day_route(title, location, play_time, num_days):
+    place_flag = [0] * len(title)
     for i in range(num_days):
         print('Day%d' % (i+1))
-        place_flag = one_day_route(title, address, play_time, place_flag)
+        place_flag = one_day_route(title, location, play_time, place_flag)
 
 
-def one_day_route(title, address, play_time, place_flag):
-    hotel_address = '上海市黄浦区浙江中路379号'
+def one_day_route(title, location, play_time, place_flag):
+    daily_place_flag = copy.deepcopy(place_flag)
+    hotel_location = location[1]
     first_place = True
     real_time = 0
     curr_place = 0
-    while real_time <= max_total_playtime:
+    while 0 in daily_place_flag:
         if first_place:
-            next_place, min_time = get_next_place(place_flag, address, hotel_address)
+            next_place, min_time = get_next_place(daily_place_flag, location, hotel_location)
             first_place = False
         else:
-            next_place, min_time = get_next_place(place_flag, address, address[curr_place])
+            next_place, min_time = get_next_place(daily_place_flag, location, location[curr_place])
 
         # Is there enough time for the next attraction?
-        _, next_2_hotel_time, _ = transit(get_lng_lat(address[next_place]), get_lng_lat(hotel_address))
+        # 从当前景点A决定去不去下一个景点B的话 应该是判断
+        # （去B的时间 + B的建议游玩时间 + B到酒店的时间） < 剩下可以玩的时间 否则标记B为今日不去的景点
+        # 并找下一个可能的B '再判断
+        _, next_2_hotel_time, _ = transit(location[next_place], hotel_location)
         cont_next_time = real_time + min_time / 60 / 60 + play_time[next_place] + next_2_hotel_time / 60 / 60
         if cont_next_time > max_total_playtime:
-            break
-
+            daily_place_flag[next_place] = 1
+            continue
         real_time = real_time + play_time[next_place] + min_time / 60 / 60
-        print("下一站：%s, 地址：%s，建议游玩时长：%d" % (title[next_place], address[next_place], play_time[next_place]))
+        print("下一站：%s, 地址：%s，建议游玩时长：%f" % (title[next_place], location[next_place], play_time[next_place]))
         curr_place = next_place
+        daily_place_flag[curr_place] = 1
         place_flag[curr_place] = 1
     return place_flag
 
 
-def get_next_place(place_flag, address, curr_place_address):
+def get_next_place(place_flag, location, curr_place_location):
     curr_time = sys.maxsize
     min_time = sys.maxsize
     next_place = 0
-    for i in range(len(address)):
+    for i in range(len(location)):
         if place_flag[i] != 1:
-            _, curr_time, _ = transit(get_lng_lat(curr_place_address), get_lng_lat(address[i]))
+            _, curr_time, _ = transit(curr_place_location, location[i])
         if curr_time < min_time:
             min_time = curr_time
             next_place = i
     return next_place, min_time
 
-#   
+
 def main():
-    title, address, play_time = load_data()
-    num_days = 4
-    num_place = choose_place(play_time, num_days)
-    multi_day_route(title[:num_place], address[:num_place], play_time[:num_place], num_days)
+    start_city = "广州"
+    end_city = "北京"
+    city_names = ["南京", "杭州"]
+    total_days = 3
+
+    # 返回的参数是一个排序数组，表示城市间的游玩顺序
+    cities_play_days = get_cities_play_days(city_names, total_days)
+    city_route, city_route_play_days = generate_inter_city_route(start_city, end_city, city_names, cities_play_days)
+    print(city_route)
+    print(city_route_play_days)
+
+    for i in range(len(city_route)):
+        print(city_route[i])
+        title, location, _, play_time = load_data(city_route[i])
+        num_days = city_route_play_days[i]
+        print(num_days)
+        num_place = choose_place(play_time, num_days)
+        multi_day_route(title[:num_place], location[:num_place], play_time[:num_place], num_days)
 
 
 if __name__ == '__main__':
