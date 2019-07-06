@@ -7,12 +7,9 @@
 import math
 import sys
 
-from TravelPlace.Crawler.CrawlerPlace import get_lng_lat
+from Crawler.CrawlerPlace import get_lng_lat
 
-# key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
-key = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
 EARTH_RADIUS = 6378.137  # 地球半径
-
 
 def generate_inter_city_route(start_city, end_city, city_names, city_play_days):
     curr_city = start_city
@@ -39,7 +36,7 @@ def generate_inter_city_route(start_city, end_city, city_names, city_play_days):
 
 def inter_city_transit(origin, destination):
     if origin['status'] == 0 & destination['status'] == 0:
-        print(origin)
+        # print(origin)
         original_lat = round(origin['result']['location']['lat'], 6)
         original_lng = round(origin['result']['location']['lng'], 6)
         destination_lat = round(destination['result']['location']['lat'], 6)

@@ -12,9 +12,9 @@ from urllib.request import urlopen, quote
 
 from requests import RequestException
 
-from TravelPlace.Crawler.CrawlerCityDays import get_city_play_days
-from TravelPlace.Crawler.CrawlerPlayTime import get_play_time
-from TravelPlace.Crawler.CrawlerSightFeature import get_sight_feature
+from Crawler.CrawlerCityDays import get_city_play_days
+from Crawler.CrawlerPlayTime import get_play_time
+from Crawler.CrawlerSightFeature import get_sight_feature
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0) Gecko/20100101 Firefox/67.0'}
@@ -24,7 +24,9 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # 从文件中读取指定城市代码，用于构造url
 def read_csv(city_name):
-    csv_file = open("./data/city_list.csv", "r")
+    module_path = os.path.dirname(os.path.dirname(__file__))
+    csv_file_name = module_path + '/data/city_list.csv'
+    csv_file = open(csv_file_name, "r")
     reader = csv.reader(csv_file)
 
     for item in reader:
@@ -69,14 +71,16 @@ def parse_html(html, index):
         title = div('dt a').text()
         address = div('.ellipsis').text()
         sight_url = "https://you.ctrip.com" + div('dt a').attr('href')
-        if get_lng_lat(address)['status'] == 0:
-            print(get_lng_lat(address))
-            lat = get_lng_lat(address)['result']['location']['lat']  # 获取纬度
-            lng = get_lng_lat(address)['result']['location']['lng']  # 获取经度
+        addressDetail = get_lng_lat(address)
+        if addressDetail['status'] == 0:
+            # print(addressDetail)
+            lat = addressDetail['result']['location']['lat']  # 获取纬度
+            lng = addressDetail['result']['location']['lng']  # 获取经度
         else:
-            print(get_lng_lat(title))
-            lat = get_lng_lat(title)['result']['location']['lat']  # 获取纬度
-            lng = get_lng_lat(title)['result']['location']['lng']  # 获取经度
+            titleDetail = get_lng_lat(title)
+            # print(titleDetail)
+            lat = titleDetail['result']['location']['lat']  # 获取纬度
+            lng = titleDetail['result']['location']['lng']  # 获取经度
 
         location = {
             "lat": lat,
@@ -96,7 +100,7 @@ def parse_html(html, index):
             "feature": sight_feature
         }
 
-        print(result)
+        # print(result)
 
         all_places.append(result)
         index += 1
@@ -107,7 +111,8 @@ def parse_html(html, index):
 def get_lng_lat(address):
     url = 'http://api.map.baidu.com/geocoder/v2/?address='
     output = 'json'
-    ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+    # ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+    ak = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
     add = quote(address)  # 本文城市变量为中文，为防止乱码，先用quote进行编码
     url2 = url + add + '&output=' + output + "&ak=" + ak
     # print(url2)
@@ -133,24 +138,26 @@ def get_city_places(city_name):
 
     # 判断文件是否存在
     city_code = read_csv(city_name)
-    if os.path.exists('./data/' + city_code + '.json'):
+    module_path = os.path.dirname(os.path.dirname(__file__))
+    if os.path.exists(module_path + '/data/' + city_code + '.json'):
         print("Read from data")
-        fp = open('./data/' + city_code + '.json', 'r', encoding='utf-8')
-        print(fp)
+        fp = open(module_path + '/data/' + city_code + '.json', 'r', encoding='utf-8')
+        # print(fp)
         city_str = json.load(fp)
 
         city_days = city_str['days']
-        for i in range(city_str['spots'][-1]['rank']):
+        # for i in range(city_str['spots'][-1]['rank']):
+        for i in range(len(city_str['spots'])):
             all_titles.append(city_str['spots'][i]['title'])
             all_location.append(city_str['spots'][i]['location'])
             all_addresses.append(city_str['spots'][i]['address'])
             all_play_time.append(city_str['spots'][i]['time'])
 
-        print(city_days)
-        print(all_titles)
-        print(all_location)
-        print(all_addresses)
-        print(all_play_time)
+        # print(city_days)
+        # print(all_titles)
+        # print(all_location)
+        # print(all_addresses)
+        # print(all_play_time)
         return city_days, all_titles, all_location, all_addresses, all_play_time
     else:
         print("Crawler")
@@ -163,7 +170,7 @@ def get_city_places(city_name):
         for index_url in get_index_url(city_code, num_pages + 1):
             html = get_html(index_url)
             if html:
-                all_places = parse_html(html, index)
+                all_places.extend(parse_html(html, index))
                 index += 15
 
         city_days = get_city_play_days(city_name)
@@ -174,22 +181,30 @@ def get_city_places(city_name):
             'spots': all_places
         }
 
-        print(city_str['spots'][-1]['rank'])
+        # print("type:")
+        # print(type(city_str))
+        # print("city_str:")
+        # print(city_str)
 
-        for i in range(city_str['spots'][-1]['rank']):
-            all_titles.append(city_str['spots'][i-1]['title'])
-            all_location.append(city_str['spots'][i-1]['location'])
-            all_addresses.append(city_str['spots'][i-1]['address'])
-            all_play_time.append(city_str['spots'][i-1]['time'])
+        # print("type:")
+        # print(type(city_str['spots'][-1]['rank']))
+        # print("city_str['spots'][-1]['rank']:")
+        # print(city_str['spots'][-1]['rank'])
 
-        f = open('./data/' + city_code + '.json', 'a', newline='', encoding='utf-8')
+        for i in range(len(city_str['spots'])):
+            all_titles.append(city_str['spots'][i]['title'])
+            all_location.append(city_str['spots'][i]['location'])
+            all_addresses.append(city_str['spots'][i]['address'])
+            all_play_time.append(city_str['spots'][i]['time'])
+
+        f = open(module_path + '/data/' + city_code + '.json', 'a', newline='', encoding='utf-8')
         f.write(json.dumps(city_str, ensure_ascii=False))
         f.close()
 
-        print(city_days)
-        print(all_titles)
-        print(all_location)
-        print(all_addresses)
-        print(all_play_time)
+        # print(city_days)
+        # print(all_titles)
+        # print(all_location)
+        # print(all_addresses)
+        # print(all_play_time)
 
         return city_days, all_titles, all_location, all_addresses, all_play_time

@@ -18,10 +18,10 @@
 import copy
 import sys
 
-from TravelPlace.Crawler.CrawlerCityDays import get_cities_play_days
-from TravelPlace.Crawler.CrawlerPlace import get_city_places
-from TravelPlace.Map.InterCityRoute import generate_inter_city_route
-from TravelPlace.Map.TwoPlacesRoute import transit
+from Crawler.CrawlerCityDays import get_cities_play_days
+from Crawler.CrawlerPlace import get_city_places
+from Map.InterCityRoute import generate_inter_city_route
+from Map.TwoPlacesRoute import transit
 
 min_total_playtime = 11
 max_total_playtime = 13
@@ -36,7 +36,6 @@ def choose_place(play_time, num_days):
     num_place = 0
     total_time = 0
     while total_time <= (max_total_playtime * num_days):
-        # print(total_time)
         total_time = total_time + play_time[num_place]
         num_place = num_place + 1
     return num_place
@@ -101,17 +100,20 @@ def main():
     # 返回的参数是一个排序数组，表示城市间的游玩顺序
     cities_play_days = get_cities_play_days(city_names, total_days)
     city_route, city_route_play_days = generate_inter_city_route(start_city, end_city, city_names, cities_play_days)
-    print(city_route)
-    print(city_route_play_days)
+    # print(city_route)
+    # print(city_route_play_days)
 
     for i in range(len(city_route)):
-        print(city_route[i])
+        # print(city_route[i])
         _, title, location, addresses, play_time = get_city_places(city_route[i])
         num_days = city_route_play_days[i]
-        print(num_days)
+        # print(num_days)
         num_place = choose_place(play_time, num_days)
         multi_day_route(title[:num_place], location[:num_place], play_time[:num_place], num_days)
 
 
 if __name__ == '__main__':
     main()
+
+
+
