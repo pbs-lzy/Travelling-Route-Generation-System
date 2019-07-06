@@ -111,8 +111,8 @@ def parse_html(html, index):
 def get_lng_lat(address):
     url = 'http://api.map.baidu.com/geocoder/v2/?address='
     output = 'json'
-    # ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
-    ak = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
+    ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+    # ak = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
     add = quote(address)  # 本文城市变量为中文，为防止乱码，先用quote进行编码
     url2 = url + add + '&output=' + output + "&ak=" + ak
     # print(url2)
