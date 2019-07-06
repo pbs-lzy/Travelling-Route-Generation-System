@@ -9,7 +9,8 @@ import sys
 
 from TravelPlace.Crawler.CrawlerPlace import get_lng_lat
 
-key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+# key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+key = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
 EARTH_RADIUS = 6378.137  # 地球半径
 
 
@@ -37,22 +38,26 @@ def generate_inter_city_route(start_city, end_city, city_names, city_play_days):
 
 
 def inter_city_transit(origin, destination):
-    original_lat = round(origin['result']['location']['lat'], 6)
-    original_lng = round(origin['result']['location']['lng'], 6)
-    destination_lat = round(destination['result']['location']['lat'], 6)
-    destination_lng = round(destination['result']['location']['lng'], 6)
+    if origin['status'] == 0 & destination['status'] == 0:
+        print(origin)
+        original_lat = round(origin['result']['location']['lat'], 6)
+        original_lng = round(origin['result']['location']['lng'], 6)
+        destination_lat = round(destination['result']['location']['lat'], 6)
+        destination_lng = round(destination['result']['location']['lng'], 6)
 
-    # 经纬度转化为弧度(rad)
-    ori_lng_rad = (original_lng * math.pi / 180.0)
-    ori_lat_rad = (original_lat * math.pi / 180.0)
-    des_lng_rad = (destination_lng * math.pi / 180.0)
-    des_lat_rad = (destination_lat * math.pi / 180.0)
+        # 经纬度转化为弧度(rad)
+        ori_lng_rad = (original_lng * math.pi / 180.0)
+        ori_lat_rad = (original_lat * math.pi / 180.0)
+        des_lng_rad = (destination_lng * math.pi / 180.0)
+        des_lat_rad = (destination_lat * math.pi / 180.0)
 
-    # 计算两点的距离，（单位：m）
-    a = ori_lat_rad - des_lat_rad
-    b = ori_lng_rad - des_lng_rad
-    s = 2 * math.asin(
-        math.sqrt(math.pow(math.sin(a / 2), 2) + math.cos(ori_lat_rad) * math.cos(des_lat_rad) * math.pow(math.sin(b / 2), 2)))
-    s = s * EARTH_RADIUS
-    distance = s * 1000
+        # 计算两点的距离，（单位：m）
+        a = ori_lat_rad - des_lat_rad
+        b = ori_lng_rad - des_lng_rad
+        s = 2 * math.asin(
+            math.sqrt(math.pow(math.sin(a / 2), 2) + math.cos(ori_lat_rad) * math.cos(des_lat_rad) * math.pow(math.sin(b / 2), 2)))
+        s = s * EARTH_RADIUS
+        distance = s * 1000
+    else:
+        print(origin['message'])
     return distance

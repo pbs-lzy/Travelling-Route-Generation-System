@@ -2,11 +2,12 @@ import urllib.parse
 import urllib.request
 import json
 
-key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+# key = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+key = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
 
 
 def transit(origin, destination):
-    # print(origin)
+    # print(origin['lat'])
     # print(destination)
     original_x = round(origin['lat'], 6)
     original_y = round(origin['lng'], 6)

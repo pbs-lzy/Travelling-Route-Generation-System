@@ -29,8 +29,8 @@ def parse_html(html):
     sight_features = ul('span').text()
     sight_content = p.text()
     result = {
-        'sight_features': sight_features,
-        'sight_content': sight_content
+        "sight_features": sight_features,
+        "sight_content": sight_content
     }
     return result
 

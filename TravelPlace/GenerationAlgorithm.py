@@ -20,7 +20,6 @@ import sys
 
 from TravelPlace.Crawler.CrawlerCityDays import get_cities_play_days
 from TravelPlace.Crawler.CrawlerPlace import get_city_places
-from TravelPlace.Crawler.CrawlerPlayTime import get_places_playtime
 from TravelPlace.Map.InterCityRoute import generate_inter_city_route
 from TravelPlace.Map.TwoPlacesRoute import transit
 
@@ -28,10 +27,9 @@ min_total_playtime = 11
 max_total_playtime = 13
 
 
-def load_data(city_name):
-    all_titles, all_location, all_addresses = get_city_places(city_name)
-    play_time = get_places_playtime(all_titles)
-    return all_titles, all_location, all_addresses, play_time
+# def load_data(city_name):
+#     city_days, all_titles, all_location, all_addresses, all_play_time = get_city_places(city_name)
+#     return all_titles, all_location, all_addresses, all_play_time
 
 
 def choose_place(play_time, num_days):
@@ -108,7 +106,7 @@ def main():
 
     for i in range(len(city_route)):
         print(city_route[i])
-        title, location, _, play_time = load_data(city_route[i])
+        _, title, location, addresses, play_time = get_city_places(city_route[i])
         num_days = city_route_play_days[i]
         print(num_days)
         num_place = choose_place(play_time, num_days)

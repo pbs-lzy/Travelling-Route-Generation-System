@@ -6,8 +6,6 @@ import requests
 from requests import RequestException
 from pyquery import PyQuery as pq
 
-csv_file_name = "D:/DevelopTest/ProjectTest/TravelPlace/data/city_list.csv"
-
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'}
 
 
@@ -15,6 +13,7 @@ def allocate_time(cities_play_days, total_days, count_days):
     allocated_playtime = []
     ave_coe = total_days / count_days
     count = 0
+    curr_day = 0
     for i in range(len(cities_play_days)):
         if i != (len(cities_play_days) - 1):
             curr_day = round(cities_play_days[i] * ave_coe)
