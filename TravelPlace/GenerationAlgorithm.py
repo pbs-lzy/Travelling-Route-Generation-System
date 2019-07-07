@@ -100,8 +100,8 @@ def main():
     # 返回的参数是一个排序数组，表示城市间的游玩顺序
     cities_play_days = get_cities_play_days(city_names, total_days)
     city_route, city_route_play_days = generate_inter_city_route(start_city, end_city, city_names, cities_play_days)
-    # print(city_route)
-    # print(city_route_play_days)
+    print(city_route)
+    print(city_route_play_days)
 
     for i in range(len(city_route)):
         # print(city_route[i])

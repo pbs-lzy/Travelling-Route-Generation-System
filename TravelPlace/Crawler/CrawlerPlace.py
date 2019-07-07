@@ -26,7 +26,7 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 def read_csv(city_name):
     module_path = os.path.dirname(os.path.dirname(__file__))
     csv_file_name = module_path + '/data/city_list.csv'
-    csv_file = open(csv_file_name, "r")
+    csv_file = open(csv_file_name, "r", encoding='utf-8')
     reader = csv.reader(csv_file)
 
     for item in reader:
@@ -71,16 +71,16 @@ def parse_html(html, index):
         title = div('dt a').text()
         address = div('.ellipsis').text()
         sight_url = "https://you.ctrip.com" + div('dt a').attr('href')
-        addressDetail = get_lng_lat(address)
-        if addressDetail['status'] == 0:
+        address_detail = get_lng_lat(address)
+        if address_detail['status'] == 0:
             # print(addressDetail)
-            lat = addressDetail['result']['location']['lat']  # 获取纬度
-            lng = addressDetail['result']['location']['lng']  # 获取经度
+            lat = address_detail['result']['location']['lat']  # 获取纬度
+            lng = address_detail['result']['location']['lng']  # 获取经度
         else:
-            titleDetail = get_lng_lat(title)
+            title_detail = get_lng_lat(title)
             # print(titleDetail)
-            lat = titleDetail['result']['location']['lat']  # 获取纬度
-            lng = titleDetail['result']['location']['lng']  # 获取经度
+            lat = title_detail['result']['location']['lat']  # 获取纬度
+            lng = title_detail['result']['location']['lng']  # 获取经度
 
         location = {
             "lat": lat,
@@ -100,7 +100,7 @@ def parse_html(html, index):
             "feature": sight_feature
         }
 
-        # print(result)
+        print(result)
 
         all_places.append(result)
         index += 1
@@ -141,9 +141,9 @@ def get_city_places(city_name):
     module_path = os.path.dirname(os.path.dirname(__file__))
     if os.path.exists(module_path + '/data/' + city_code + '.json'):
         print("Read from data")
-        fp = open(module_path + '/data/' + city_code + '.json', 'r', encoding='utf-8')
-        # print(fp)
-        city_str = json.load(fp)
+        f = open(module_path + '/data/' + city_code + '.json', 'r', encoding='utf-8')
+        # print(f)
+        city_str = json.load(f)
 
         city_days = city_str['days']
         # for i in range(city_str['spots'][-1]['rank']):
@@ -158,6 +158,7 @@ def get_city_places(city_name):
         # print(all_location)
         # print(all_addresses)
         # print(all_play_time)
+        f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time
     else:
         print("Crawler")
@@ -206,5 +207,5 @@ def get_city_places(city_name):
         # print(all_location)
         # print(all_addresses)
         # print(all_play_time)
-
+        f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time

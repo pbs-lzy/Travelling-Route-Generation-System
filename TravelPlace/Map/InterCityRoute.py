@@ -11,6 +11,7 @@ from Crawler.CrawlerPlace import get_lng_lat
 
 EARTH_RADIUS = 6378.137  # 地球半径
 
+
 def generate_inter_city_route(start_city, end_city, city_names, city_play_days):
     curr_city = start_city
     city_flag = [0] * len(city_names)
