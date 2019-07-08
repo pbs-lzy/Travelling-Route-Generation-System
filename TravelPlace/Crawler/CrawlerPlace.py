@@ -29,6 +29,7 @@ def read_csv(city_name):
     csv_file = open(csv_file_name, "r", encoding='utf-8')
     reader = csv.reader(csv_file)
 
+    #   可用二分查找加速
     for item in reader:
         if reader.line_num == 1:
             continue
@@ -36,6 +37,7 @@ def read_csv(city_name):
             csv_file.close()
             return item[1]
 
+    csv_file.close()
 
 def get_pages_from(city_code, num_pages):
     # print(city_code)
@@ -100,7 +102,7 @@ def parse_html(html, index):
             "feature": sight_feature
         }
 
-        print(result)
+        # print(result)
 
         all_places.append(result)
         index += 1
@@ -153,11 +155,6 @@ def get_city_places(city_name):
             all_addresses.append(city_str['spots'][i]['address'])
             all_play_time.append(city_str['spots'][i]['time'])
 
-        # print(city_days)
-        # print(all_titles)
-        # print(all_location)
-        # print(all_addresses)
-        # print(all_play_time)
         f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time
     else:
@@ -182,15 +179,6 @@ def get_city_places(city_name):
             'spots': all_places
         }
 
-        # print("type:")
-        # print(type(city_str))
-        # print("city_str:")
-        # print(city_str)
-
-        # print("type:")
-        # print(type(city_str['spots'][-1]['rank']))
-        # print("city_str['spots'][-1]['rank']:")
-        # print(city_str['spots'][-1]['rank'])
 
         for i in range(len(city_str['spots'])):
             all_titles.append(city_str['spots'][i]['title'])
@@ -202,10 +190,4 @@ def get_city_places(city_name):
         f.write(json.dumps(city_str, ensure_ascii=False))
         f.close()
 
-        # print(city_days)
-        # print(all_titles)
-        # print(all_location)
-        # print(all_addresses)
-        # print(all_play_time)
-        f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time
