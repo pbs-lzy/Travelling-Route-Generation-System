@@ -14,6 +14,7 @@ from pyquery import PyQuery as pq
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'}
 
 # 从文件中读取指定城市代码，用于构造url
+#   get the city_code by the city_name
 def read_csv(city_name):
     module_path = os.path.dirname(os.path.dirname(__file__))
     csv_file_name = module_path + '/data/city_list.csv'
@@ -30,6 +31,7 @@ def read_csv(city_name):
 
     csv_file.close()
 
+#   generate the play times of different cities by scaling up or down
 def allocate_time(cities_play_days, total_days, count_days):
     allocated_playtime = []
     ave_coe = total_days / count_days
@@ -50,15 +52,15 @@ def get_cities_play_days(city_names_list, total_days):
     count_days = 0
     for city_name in city_names_list:
         play_day = get_city_play_days(city_name)
-        time.sleep(2)
+        # time.sleep(2)
         cities_play_days.append(int(play_day))
         count_days += int(play_day)
     allocated_play_days = allocate_time(cities_play_days, total_days, count_days)
     return allocated_play_days
 
-
+#   get the city recommended playtime in json file
 def get_city_play_days(city_name):
-    method = "byCrawler"
+    method = "byJSON"
     if method == "byJSON":
         city_code = read_csv(city_name)
         module_path = os.path.dirname(os.path.dirname(__file__))
@@ -66,6 +68,7 @@ def get_city_play_days(city_name):
         city_str = json.load(f)
         city_days = city_str['days']
         f.close()
+        # can return log latitude
         return city_days
     else:
         url_code_city_name = urllib.parse.quote(city_name)

@@ -11,7 +11,6 @@ from pyquery import PyQuery as pq
 from urllib.request import urlopen, quote
 
 from requests import RequestException
-
 from Crawler.CrawlerCityDays import get_city_play_days
 from Crawler.CrawlerPlayTime import get_play_time
 from Crawler.CrawlerSightFeature import get_sight_feature
@@ -111,17 +110,27 @@ def parse_html(html, index):
 
 # 构造获取经纬度的函数
 def get_lng_lat(address):
-    url = 'http://api.map.baidu.com/geocoder/v2/?address='
-    output = 'json'
-    ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
-    # ak = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
-    add = quote(address)  # 本文城市变量为中文，为防止乱码，先用quote进行编码
-    url2 = url + add + '&output=' + output + "&ak=" + ak
-    # print(url2)
-    req = urlopen(url2)
-    res = req.read().decode()
-    temp = json.loads(res)
-    return temp
+    method = "byCrawler"
+    if method == "byJSON":
+        city_code = read_csv(city_name)
+        module_path = os.path.dirname(os.path.dirname(__file__))
+        f = open(module_path + '/data/' + city_code + '.json', 'r', encoding='utf-8')
+        city_str = json.load(f)
+        city_days = city_str['days']
+        f.close()
+        return city_days
+    else:
+        url = 'http://api.map.baidu.com/geocoder/v2/?address='
+        output = 'json'
+        ak = 'qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt'
+        # ak = 'YBbMVlde0GPAUl6ePBQY2pIfRwkcqFe6'
+        add = quote(address)  # 本文城市变量为中文，为防止乱码，先用quote进行编码
+        url2 = url + add + '&output=' + output + "&ak=" + ak
+        # print(url2)
+        req = urlopen(url2)
+        res = req.read().decode()
+        temp = json.loads(res)
+        return temp
 
 
 def get_city_places(city_name):
@@ -142,7 +151,7 @@ def get_city_places(city_name):
     city_code = read_csv(city_name)
     module_path = os.path.dirname(os.path.dirname(__file__))
     if os.path.exists(module_path + '/data/' + city_code + '.json'):
-        print("Read from data")
+        # print("Read from data")
         f = open(module_path + '/data/' + city_code + '.json', 'r', encoding='utf-8')
         # print(f)
         city_str = json.load(f)
@@ -154,7 +163,6 @@ def get_city_places(city_name):
             all_location.append(city_str['spots'][i]['location'])
             all_addresses.append(city_str['spots'][i]['address'])
             all_play_time.append(city_str['spots'][i]['time'])
-
         f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time
     else:

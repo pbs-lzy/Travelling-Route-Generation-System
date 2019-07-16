@@ -36,6 +36,9 @@ def generate_inter_city_route(start_city, end_city, city_names, city_play_days):
 
 
 def inter_city_transit(origin, destination):
+    
+
+    
     if origin['status'] == 0 & destination['status'] == 0:
         # print(origin)
         original_lat = round(origin['result']['location']['lat'], 6)
@@ -59,3 +62,5 @@ def inter_city_transit(origin, destination):
     else:
         print(origin['message'])
     return distance
+
+
