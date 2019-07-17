@@ -43,7 +43,7 @@ def allocate_time(cities_play_days, total_days, count_days):
             allocated_playtime.append(curr_day)
             count += curr_day
         else:
-            allocated_playtime.append(total_days - curr_day)
+            allocated_playtime.append(total_days - count)
     return allocated_playtime
 
 

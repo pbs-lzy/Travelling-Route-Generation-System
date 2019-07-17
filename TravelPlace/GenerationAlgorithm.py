@@ -17,6 +17,8 @@
 """
 import copy
 import sys
+import requests
+import numpy
 
 from Crawler.CrawlerCityDays import get_cities_play_days
 from Crawler.CrawlerPlace import get_city_places
@@ -41,37 +43,62 @@ def choose_place(play_time, num_days):
     return num_place
 
 
-def multi_day_route(title, location, play_time, num_days):
+def multi_day_route(hotelLocation, title, location, play_time, num_days):
     place_flag = [0] * len(title)
+    hotel_time_matrix = numpy.zeros(len(location))
+    for i in range(len(location)):
+        _, hotel_time_matrix[i], _ = transit(hotelLocation, location[i])
+
+    hotel_return_time_matrix = numpy.zeros(len(location))
+    for i in range(len(location)):
+        _, hotel_return_time_matrix[i], _ = transit(location[i], hotelLocation)
+
+    time_matrix = numpy.zeros((len(location), len(location)))
+    for i in range(len(location)):
+        for j in range(len(location)):
+            _, time_matrix[i][j], _ = transit(location[i], location[j])
+
     for i in range(num_days):
-        print('Day%d' % (i+1))
-        place_flag = one_day_route(title, location, play_time, place_flag)
+        # print('Day%d' % (i+1), flush=True)
+        place_flag = one_day_route(title, location, play_time, place_flag, hotel_time_matrix, hotel_return_time_matrix, time_matrix)
 
 
-def one_day_route(title, location, play_time, place_flag):
+def one_day_route(title, location, play_time, place_flag, hotel_time_matrix, hotel_return_time_matrix, time_matrix):
     daily_place_flag = copy.deepcopy(place_flag)
-    hotel_location = location[1]
     first_place = True
     real_time = 0
     curr_place = 0
+
     while 0 in daily_place_flag:
+        curr_time = sys.maxsize
+        min_time = sys.maxsize
         if first_place:
-            next_place, min_time = get_next_place(daily_place_flag, location, hotel_location)
+            for i in range(len(hotel_time_matrix)):
+                if daily_place_flag[i] != 1:
+                    curr_time = hotel_time_matrix[i]
+                if curr_time < min_time:
+                    min_time = curr_time
+                    next_place = i
             first_place = False
         else:
-            next_place, min_time = get_next_place(daily_place_flag, location, location[curr_place])
+            for i in range(len(time_matrix)):
+                if daily_place_flag[i] != 1:
+                    curr_time = time_matrix[curr_place][i]
+                if curr_time < min_time:
+                    min_time = curr_time
+                    next_place = i
 
         # Is there enough time for the next attraction?
         # 从当前景点A决定去不去下一个景点B的话 应该是判断
         # （去B的时间 + B的建议游玩时间 + B到酒店的时间） < 剩下可以玩的时间 否则标记B为今日不去的景点
         # 并找下一个可能的B '再判断
-        _, next_2_hotel_time, _ = transit(location[next_place], hotel_location)
+        next_2_hotel_time = hotel_return_time_matrix[next_place]
         cont_next_time = real_time + min_time / 60 / 60 + play_time[next_place] + next_2_hotel_time / 60 / 60
         if cont_next_time > max_total_playtime:
             daily_place_flag[next_place] = 1
             continue
         real_time = real_time + play_time[next_place] + min_time / 60 / 60
-        print("下一站：%s, 地址：%s，建议游玩时长：%f" % (title[next_place], location[next_place], play_time[next_place]))
+        print("下一站：%s, 地址：%s，建议游玩时长：%f" % (title[next_place], location[next_place], play_time[next_place]), flush=True)
         curr_place = next_place
         daily_place_flag[curr_place] = 1
         place_flag[curr_place] = 1
@@ -92,6 +119,7 @@ def get_next_place(place_flag, location, curr_place_location):
 
 
 def main(argv):
+    # python3 /Users/lauzingai/Desktop/Travelling-Route-Generation-System/TravelPlace/ItineraryGenerator.py 广州 北京 7 Luxury Loose 长沙 天津
     # start_city = "广州"
     start_city = sys.argv[1]
     # end_city = "北京"
@@ -99,27 +127,47 @@ def main(argv):
     # total_days = 3
     total_days = int(argv[3])
     # city_names = ["南京", "杭州"]
+    hotel_luxury = argv[4]
+    schedule_type = argv[5]
     city_names = []
-    for i in range(4, len(argv)):
+    for i in range(6, len(argv)):
         city_names.append(sys.argv[i])
+
+    if schedule_type == "Loose":
+        max_total_playtime = 11
+    elif schedule_type == "Moderate":
+        max_total_playtime = 12
+    else:
+        max_total_playtime = 13
 
 
     # 返回的参数是一个排序数组，表示城市间的游玩顺序
     cities_play_days = get_cities_play_days(city_names, total_days)
-    print("cities_play_days:")
-    print(cities_play_days)
+    print("cities_play_days:", flush=True)
+    print(cities_play_days, flush=True)
     
     city_route, city_route_play_days = generate_inter_city_route(start_city, end_city, city_names, cities_play_days)
-    print(city_route)
-    print(city_route_play_days)
+    print(city_route, flush=True)
+    print(city_route_play_days, flush=True)
 
     for i in range(len(city_route)):
-        # print(city_route[i])
         _, title, location, addresses, play_time = get_city_places(city_route[i])
         num_days = city_route_play_days[i]
-        # print(num_days)
         num_place = choose_place(play_time, num_days)
-        multi_day_route(title[:num_place], location[:num_place], play_time[:num_place], num_days)
+
+        hotelapi = ""
+        if hotel_luxury == "Economic":
+            hotelapi = "http://api.map.baidu.com/place/v2/search?query=酒店&region=" + city_route[i] + "&scope=2&industry_type=hotel&filter=sort_name:level|sort_rule:1&output=json&ak=qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt"
+        elif hotel_luxury == "Luxury":
+            hotelapi = "http://api.map.baidu.com/place/v2/search?query=酒店&region=" + city_route[i] + "&scope=2&industry_type=hotel&filter=sort_name:level|sort_rule:0&output=json&ak=qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt"
+        else:
+            hotelapi = "http://api.map.baidu.com/place/v2/search?query=酒店&region=" + city_route[i] + "&scope=2&industry_type=hotel&filter=sort_name:total_score|sort_rule:0&output=json&ak=qe6LKhNsAcSPGixXUz0NZGRsZCFYhzwt"
+        r = requests.get(hotelapi)
+        json_object = r.json()
+        hotelName = json_object["results"][0]["name"]
+        hotelLocation = json_object["results"][0]["location"]
+
+        multi_day_route(hotelLocation, title[:num_place], location[:num_place], play_time[:num_place], num_days)
 
 
 if __name__ == '__main__':

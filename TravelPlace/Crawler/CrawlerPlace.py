@@ -162,7 +162,10 @@ def get_city_places(city_name):
             all_titles.append(city_str['spots'][i]['title'])
             all_location.append(city_str['spots'][i]['location'])
             all_addresses.append(city_str['spots'][i]['address'])
-            all_play_time.append(city_str['spots'][i]['time'])
+            if city_str['spots'][i]['time']:
+                all_play_time.append(city_str['spots'][i]['time'])
+            else:
+                all_play_time.append(2.0)
         f.close()
         return city_days, all_titles, all_location, all_addresses, all_play_time
     else:
