@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="Find easily a traveling route">
+	<meta name="author" content="Ansonika">
+	<title>Route Generation</title>
+
+	<!-- Favicons-->
+	<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" type="image/x-icon" href="img/apple-touch-icon-57x57-precomposed.png">
+	<link rel="apple-touch-icon" type="image/x-icon" sizes="72x72" href="img/apple-touch-icon-72x72-precomposed.png">
+	<link rel="apple-touch-icon" type="image/x-icon" sizes="114x114" href="img/apple-touch-icon-114x114-precomposed.png">
+	<link rel="apple-touch-icon" type="image/x-icon" sizes="144x144" href="img/apple-touch-icon-144x144-precomposed.png">
+
+	<!-- BASE CSS -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
+	<link href="css/menu.css" rel="stylesheet">
+	<link href="css/vendors.css" rel="stylesheet">
+	<link href="css/icon_fonts/css/all_icons_min.css" rel="stylesheet">
+
+	<!-- SPECIFIC CSS -->
+	<link href="css/tables.css" rel="stylesheet">
+    
+	<!-- YOUR CUSTOM CSS -->
+	<link href="css/custom.css" rel="stylesheet">
+	
+	<!-- Modernizr -->
+	<script src="js/modernizr_tables.js"></script>
+	
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+		.search_bar_wrapper{
+			background:#0adec0;
+		}
+		.search_bar_wrapper:hover{
+			cursor:hand;
+			background:#e74e84;
+		}
+		.list_title{
+			background:#0adec0;
+		}
+    </style>
+
+</head>
+
+<body>
+
+	<div class="layer"></div>
+	<!-- Mobile menu overlay mask -->
+
+	<div id="preloader">
+		<div data-loader="circle-side"></div>
+	</div>
+	<!-- End Preload -->
+
+	<!-- /Header -->
+
+	<div class="container-fluid full-height">
+		<div class="row row-height">
+			<div class="col-lg-3 content-left" id="daylist" style="padding-top:0px;">
+			<!-- /margin_60_35 -->
+			
+					<div class="search_bar_wrapper" style="display: none;">
+						<div class="search_bar_list">
+							<div class='strip_list' style='margin-bottom:0px; height:107px;'>
+										<figure>
+											<a href='javascript:void(0)' onclick='map("1","南京",titles,time,longitude,latitude)'><img src='img/d1.png' alt=''></a>
+										</figure>
+										<h3>23/6</h3>
+										<br>
+										Nanjing
+							</div>
+						</div>
+					</div>	
+					<div class="search_bar_wrapper" style="display: none;">
+						<div class="search_bar_list">
+							<div class='strip_list' style='margin-bottom:0px; height:107px;'>
+										<figure>
+											<a href='javascript:void(0)' onclick='mapRoute2()'><img src='img/d2.png' alt=''></a>
+										</figure>
+										<h3>24/6</h3>
+										<br>
+										Nanjing
+										<br>
+							</div>
+						</div>
+					</div>
+					<div class="search_bar_wrapper" style="display: none;">
+						<div class="search_bar_list">
+							<div class='strip_list' style='margin-bottom:0px; height:107px;'>
+										<figure>
+											<a href='javascript:void(0)' onclick='mapRoute3()'><img src='img/d3.png' alt=''></a>
+										</figure>
+										<h3>25/6</h3>
+										<br>
+										Hangzhou
+										<br>
+							</div>
+						</div>
+					</div>
+					
+					<!-- /filters -->
+			</div>
+			<script>
+				
+				var city="南京";
+				var titles=new Array("南京金汇大酒店","红山森林动物园","玄武湖","中山陵景区");
+				var longitude=new Array("118.794644","118.80525812089361","118.79930925614538","118.84760955880598");
+				var latitude=new Array("32.027227","32.10212389126866","32.08041701905591","32.05287694557689");
+				var time=new Array("0","3","4","4");
+				
+				var city2="南京";
+				var titles2=new Array("南京金汇大酒店","秦淮河画舫","夫子庙秦淮河风光带","瞻园","南京总统府","侵华日军南京大屠杀遇难同胞纪念馆");
+				var longitude2=new Array("118.794644","118.79521999339607","118.79523536699658","118.79171149414205","118.75147800730005","118.8039743524893");
+				var latitude2=new Array("32.027227","32.027081718573854","32.02774395091252","32.02664641893529","32.040613954051466","32.04903823294875");
+				var time2=new Array("0","1","2","2","2","3");
+				var day=new Array();
+				var len=2;
+				var html="";
+				day[0]=[city,titles,time,longitude,latitude];
+				day[1]=[city2,titles2,time2,longitude2,latitude2];
+				
+				
+				for(i=0;i<day.length;i++){
+					
+					html+="<div class='search_bar_wrapper'><div class='search_bar_list'><div class='strip_list' style='margin-bottom:0px; height:107px;'><figure><a href='javascript:void(0)' onclick='map(\""+(i+1)+"\",\""+day[i][0]+"\","+"day["+i+"][1]"+","+"day["+i+"][2]"+","+"day["+i+"][3],"+"day["+i+"][4])'><img src='img/d"+(i+1)+".png' alt=''></a></figure><h3>"+i+"</h3><br>"+day[i][0]+"</div></div></div>";
+				}
+				var daylist=document.getElementById("daylist");
+				var temp=daylist.innerHTML;
+				daylist.innerHTML=temp+html;
+			</script>
+			<!-- /content-left-->
+		
+			<div class="col-lg-5 content-left" id="listdiv" style="padding-top:0px;">
+				<div id="d1" class="list_home" style="display: none;">
+                            <div class="list_title">
+                                
+                                <h3>23/6</h3>
+								<br>
+									南京
+								<br>
+                            </div>
+                            <ul>
+                                <li><a href=""><strong>酒店</strong>南京金汇大酒店</a></li>
+								<li><a href=""><strong>Taxi</strong>3.69km  14min</a></li>
+								<li><a href=""><strong>1</strong>秦淮河画舫</a></li>
+								<li><a href=""><strong>2</strong>夫子庙秦淮河风光带</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>3</strong>瞻园</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>4</strong>南京总统府</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>5</strong>侵华日军南京大屠杀遇难同胞纪念馆</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>酒店</strong>南京金汇大酒店</a></li>
+							
+                            </ul>
+                </div>
+				<div id="d2" class="list_home" style="display: none;">
+                            <div class="list_title">
+                                
+                                <h3>24/6</h3>
+								<br>
+									南京
+								<br>
+                            </div>
+                            <ul>
+                                <li><a href=""><strong>酒店</strong>南京金汇大酒店</a></li>
+								<li><a href=""><strong>Taxi</strong>3.69km  14min</a></li>
+								<li><a href=""><strong>1</strong>红山森林动物园</a></li>
+								<li><a href=""><strong>Taxi</strong>14.28km  30min</a></li>
+								<li><a href=""><strong>2</strong>玄武湖</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>3</strong>中山陵景区</a></li>
+								
+								<li><a href=""><strong>酒店</strong>南京金汇大酒店</a></li>
+							
+                            </ul>
+                </div>
+				<div id="d3" class="list_home" style="display: none;">
+                            <div class="list_title">
+                                
+                                <h3>25/6</h3>
+								<br>
+									杭州
+								<br>
+                            </div>
+                            <ul>
+                                <li><a href=""><strong>酒店</strong>杭州JW万豪酒店</a></li>
+								<li><a href=""><strong>Taxi</strong>3.69km  14min</a></li>
+								<li><a href=""><strong>1</strong>灵隐寺</a></li>
+								<li><a href=""><strong>Taxi</strong>14.28km  30min</a></li>
+								<li><a href=""><strong>2</strong>杭州动物园</a></li>
+								<li><a href=""><strong>Taxi</strong>6.72km  25min</a></li>
+								<li><a href=""><strong>3</strong>杭州宋城景区</a></li>
+								
+								<li><a href=""><strong>酒店</strong>杭州JW万豪酒店</a></li>
+							
+                            </ul>
+                </div>
+			</div>
+			
+			<div class="col-lg-4">
+				<div id="map_listing"></div>
+				<!-- map-->
+			</div>
+			<!-- /map-right-->
+			
+		</div>
+		<!-- /row-->
+	</div>
+	<!-- /container-fluid -->
+
+	<!-- COMMON SCRIPTS -->
+	<script src="js/jquery-2.2.4.min.js"></script>
+	<script src="js/common_scripts.min.js"></script>
+	<script src="assets/validate.js"></script>
+	<script src="js/functions.js"></script>
+    
+    <!-- SPECIFIC SCRIPTS -->
+    
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+    <!--<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyCvI1uy8W1WWeK5Or8Qq47QCPQX94dprXE&callback=initMap" async defer></script>
+	<script src="js/map_listingv2.js"></script>-->
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=tdOqYSMs77Arf9FAV6AA2yX3FGBUk45y&callback=initMap"></script>
+	<script src="js/map.js"></script>
+    <script src="js/infobox.js"></script> 
+    <script src="js/jquery.selectbox-0.2.js"></script>
+	<script>
+		$(".selectbox").selectbox();
+	</script>
+</body>
+
+</html>
