@@ -1,17 +1,25 @@
 """
 CrawlJSON:main():
-    CrawlJSON:get_index_url(item[1], num_pages + 1)
-        CrawlJSON:get_pages_from(city_code, num_pages)
-    CrawlJSON:get_html(index_url)
-    CrawlJSON:parse_html(html, index)
-        CrawlJSON:get_lng_lat(address)
-        CrawlerSightFeature:get_sight_feature(sight_url)
-        CrawlerPlayTime:get_play_time(title)
-    CrawlerCityDays:get_city_play_days(item[0])
-        CrawlerCityDays:get_html(search_url)
-        CrawlerCityDays:parse_city_html(html)
-        CrawlerCityDays:get_html(city_url)
-        CrawlerCityDays:parse_detail_html(city_html)
+    CrawlJSON:crawl_all_city(startline, endline)
+        CrawlJSON:get_index_url(item[1], num_pages + 1)
+            CrawlJSON:get_pages_from(city_code, num_pages)
+        CrawlJSON:get_html(index_url)
+        CrawlJSON:parse_html(html, index)
+            CrawlJSON:get_lng_lat(address)
+            CrawlerSightFeature:get_sight_feature(sight_url)
+                CrawlerSightFeature:get_index_url(sight_url)
+                CrawlerSightFeature:get_html(index_url)
+                CrawlerSightFeature:parse_html(html)
+            CrawlerPlayTime:get_play_time(title)
+                CrawlerPlayTime:get_html(search_url)
+                CrawlerPlayTime:parse_place_html(html)
+                CrawlerPlayTime:get_time(play_time_str)
+                    CrawlerPlayTime:str_2_int(play_time_str)
+        CrawlerCityDays:get_city_play_days(item[0])
+            CrawlerCityDays:get_html(search_url)
+            CrawlerCityDays:parse_city_html(html)
+            CrawlerCityDays:get_html(city_url)
+            CrawlerCityDays:parse_detail_html(city_html)
 """
 import copy
 import sys
@@ -86,13 +94,13 @@ def parse_html(html, index):
         play_time = get_play_time(title)
 
         result = {
-            "title": title,
-            "address": address,
+            "title": title, # ctrip
+            "address": address, # ctrip
             "image": image_name,
-            "rank": index,
-            "time": play_time,
-            "location": location,
-            "feature": sight_feature
+            "rank": index, # ctrip
+            "time": play_time, # qunar
+            "location": location, # baidu
+            "feature": sight_feature # ctrip
         }
 
         # print(result)

@@ -205,6 +205,8 @@ def main(argv):
     
     city_route, city_route_play_days = generate_inter_city_route(start_city, end_city, city_names, cities_play_days)
 
+    print(start_city + '|' + end_city)
+
     phpoutput = ""
     for item in city_route:
         phpoutput += item + '|'
